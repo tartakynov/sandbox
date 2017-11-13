@@ -3,7 +3,6 @@
 import sys
 from random import shuffle
 
-
 """
 https://www.hackerrank.com/challenges/spies-revised/problem
 Solved with hill climbing technique
@@ -27,6 +26,14 @@ def collinear(x1, y1, x2, y2, x3, y3):
     return (y1 - y2) * (x1 - x3) == (y1 - y3) * (x1 - x2)
 
 
+def diagonal(x1, y1, x2, y2):
+    """
+    Check if the line between the two points is at a 45 degree angle to the horizontal
+    """
+
+    return abs(x1 - x2) == abs(y1 - y2)
+
+
 def number_of_blown_covers(n, solution):
     """
     Total number of blown covers
@@ -35,8 +42,11 @@ def number_of_blown_covers(n, solution):
     count = 0
     for x1 in xrange(n):
         for x2 in xrange(x1 + 1, n):
+            y1, y2 = solution[x1], solution[x2]
+            if diagonal(x1, y1, x2, y2):
+                count += 1
             for x3 in xrange(x2 + 1, n):
-                y1, y2, y3 = solution[x1], solution[x2], solution[x3]
+                y3 = solution[x3]
                 if collinear(x1, y1, x2, y2, x3, y3):
                     count += 1
     return count
@@ -77,8 +87,8 @@ def print_grid(out, n, solution):
 
 
 def main():
-    n, score, solution = hill_climber(7)
-    print solution
+    n, score, solution = hill_climber(9)
+    print solution, score
     print_grid(sys.stdout, n, solution)
 
 
