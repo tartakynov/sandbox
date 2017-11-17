@@ -1,3 +1,4 @@
 *.pyd
 *.out
 .idea/
+*.log
