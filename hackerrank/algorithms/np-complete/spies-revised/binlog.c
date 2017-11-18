@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/types.h>
-#include <time.h>
 
 #include "binlog.h"
 
@@ -28,11 +26,7 @@ int log_close() {
         return 1;
     }
 
-    if (fsync(binlog_fd) < 0) {
-        fprintf(stderr, "error syncing binlog\n");
-        return 1;
-    }
-
+    fsync(binlog_fd);
     close(binlog_fd);
     binlog_fd = -1;
     return 0;
@@ -40,60 +34,42 @@ int log_close() {
 
 
 int log_write_solution(int n, int *solution) {
-    int size;
-
     if (binlog_fd == -1) {
         fprintf(stderr, "please call log_init() before using binlog\n");
         return 1;
     }
 
-    size = sizeof(int) * n;
-    if (write(binlog_fd, solution, size) != size) {
-        fprintf(stderr, "unable to write %d bytes into the binlog file\n", size);
-        return -1;
-    }
-
-    size = sizeof(int);
-    if (write(binlog_fd, &n, size) != size) {
-        fprintf(stderr, "unable to write %d bytes into the binlog file\n", size);
-        return -1;
-    }
-
-    if (fsync(binlog_fd) < 0) {
-        fprintf(stderr, "error syncing binlog\n");
-        return 1;
-    }
-
+    write(binlog_fd, solution, sizeof(int) * n);
+    write(binlog_fd, &n, sizeof(int));
+    fsync(binlog_fd);
     return 0;
 }
 
 
 int log_read_solution(int *n, int **solution) {
-    int header_size, solution_size;
+    size_t solution_size;
 
     if (binlog_fd == -1) {
         fprintf(stderr, "please call log_init() before using binlog\n");
         return 1;
     }
 
-    header_size = sizeof(int);
-    lseek(binlog_fd, -header_size, SEEK_END);
-
-    if (read(binlog_fd, n, header_size) != header_size) {
-        fprintf(stderr, "failed to read (1) from binlog\n");
+    if (lseek(binlog_fd, -sizeof(int), SEEK_END) < 0) {
+        return 1;
+    }
+    if (read(binlog_fd, n, sizeof(int)) != sizeof(int)) {
         return 1;
     }
 
     solution_size = sizeof(int) * (*n);
     *solution = malloc(solution_size);
-    lseek(binlog_fd, -(header_size + solution_size), SEEK_END);
-
+    if (lseek(binlog_fd, -(sizeof(int) + solution_size), SEEK_END) < 0) {
+        return 1;
+    }
     if (read(binlog_fd, *solution, solution_size) != solution_size) {
-        fprintf(stderr, "failed to read (2) from binlog\n");
         return 1;
     }
 
     lseek(binlog_fd, 0, SEEK_END);
-
     return 0;
 }

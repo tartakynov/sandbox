@@ -116,11 +116,14 @@ int main(int argc, char* argv[]) {
 
     srand(time(NULL));
     log_init();
-    if ((strcmp(argv[1], "-c") && strcmp(argv[1], "--continue")) == 0) {
-        log_read_solution(&n, &solution);
+    if (strcmp(argv[1], "-c") == 0 || strcmp(argv[1], "--continue") == 0) {
+        if (log_read_solution(&n, &solution) != 0) {
+            printf("failed to read binlog\n");
+            return 1;
+        }
     } else {
         errno = 0;
-        n = strtol(argv[1], NULL, 0);
+        n = (int) strtol(argv[1], NULL, 0);
         if (errno) {
             printf("error parsing N\n");
             return 1;
