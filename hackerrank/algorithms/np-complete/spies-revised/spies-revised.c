@@ -3,12 +3,13 @@
 #include <time.h>
 #include <string.h>
 #include <errno.h>
+#include <math.h>
 
 #include "binlog.h"
 
 /*
 https://www.hackerrank.com/challenges/spies-revised/problem
-Trying to solve with hill climbing technique, although it's very slow with bigger N
+Trying to solve with hill climbing or simulated anneal techniques, although it's very slow with bigger N
 */
 
 static inline void swap(int *solution, int first, int second) {
@@ -43,7 +44,7 @@ void random_solution(int n, int *solution) {
     }
 
     for (i = 0; i < n; i++) {
-        j = rand() % n;
+        j = (int) (random() % n);
         swap(solution, i, j);
     }
 }
@@ -92,7 +93,7 @@ int hill_climber(int n, int *solution) {
                     printf("score = %d\n", current_score);
                     log_write_solution(n, solution);
                 } else if (current_score == next_score) {
-                    if (rand() % 2 == 0) {
+                    if (random() % 2 == 0) {
                         swap(solution, i, j);
                     }
                 } else {
@@ -100,6 +101,41 @@ int hill_climber(int n, int *solution) {
                 }
             }
         }
+    }
+
+    return current_score;
+}
+
+/**
+ * Runs until solution is found
+ */
+int simulated_anneal(int n, int *solution) {
+    double temperature, epsilon, flip, alpha;
+    int i, j;
+    int current_score, delta;
+
+    alpha = 0.999;
+    epsilon = 0.001;
+    temperature = 400.0;
+    current_score = number_of_blown_covers(n, solution);
+    while (temperature > epsilon && current_score > 0) {
+        i = (int) (random() % n);
+        j = (int) (random() % n);
+        swap(solution, i, j);
+        delta = number_of_blown_covers(n, solution) - current_score;
+        if (delta < 0) {
+            current_score += delta;
+            printf("temperature = %.5f, score = %d\n", temperature, current_score);
+        } else {
+            flip = ((double) random()) / RAND_MAX;
+            if (exp(-delta / temperature) > flip) {
+                current_score += delta;
+            } else {
+                swap(solution, i, j);
+            }
+        }
+
+        temperature *= alpha;
     }
 
     return current_score;
@@ -114,13 +150,15 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    srand(time(NULL));
+    srand((unsigned int) time(NULL));
     log_init();
     if (strcmp(argv[1], "-c") == 0 || strcmp(argv[1], "--continue") == 0) {
         if (log_read_solution(&n, &solution) != 0) {
             printf("failed to read binlog\n");
             return 1;
         }
+
+        printf("n = %d\n", n);
     } else {
         errno = 0;
         n = (int) strtol(argv[1], NULL, 0);
