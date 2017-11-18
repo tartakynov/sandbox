@@ -103,22 +103,3 @@ int log_read_solution(int *score, int *n, int **solution) {
 
     return 0;
 }
-
-int main(void) {
-    int i, score;
-    int n;
-    int *solution;
-
-    log_init();
-    if (log_read_solution(&score, &n, &solution) == 0) {
-        printf("n = %d, score = %d\n", n, score);
-        for (i = 0; i < n; i++) {
-            printf("%d ", solution[i]);
-        }
-
-        printf("\n");
-        free(solution);
-    }
-
-    log_close();
-}
