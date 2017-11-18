@@ -2,3 +2,5 @@
 *.out
 .idea/
 *.log
+*.o
+*.bin

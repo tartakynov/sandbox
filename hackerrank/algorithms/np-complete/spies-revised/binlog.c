@@ -16,7 +16,7 @@ int log_init() {
         return 1;
     }
 
-    binlog_fd = open("bin.log", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
+    binlog_fd = open("log.bin", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
     lseek(binlog_fd, 0, SEEK_END);
     return 0;
 }
@@ -39,8 +39,7 @@ int log_close() {
 }
 
 
-int log_write_solution(int score, int n, int *solution) {
-    struct solution_header header;
+int log_write_solution(int n, int *solution) {
     int size;
 
     if (binlog_fd == -1) {
@@ -54,10 +53,8 @@ int log_write_solution(int score, int n, int *solution) {
         return -1;
     }
 
-    header.n = n;
-    header.score = score;
-    size = sizeof(header);
-    if (write(binlog_fd, &header, size) != size) {
+    size = sizeof(int);
+    if (write(binlog_fd, &n, size) != size) {
         fprintf(stderr, "unable to write %d bytes into the binlog file\n", size);
         return -1;
     }
@@ -71,26 +68,23 @@ int log_write_solution(int score, int n, int *solution) {
 }
 
 
-int log_read_solution(int *score, int *n, int **solution) {
+int log_read_solution(int *n, int **solution) {
     int header_size, solution_size;
-    struct solution_header header;
 
     if (binlog_fd == -1) {
         fprintf(stderr, "please call log_init() before using binlog\n");
         return 1;
     }
 
-    header_size = sizeof(header);
+    header_size = sizeof(int);
     lseek(binlog_fd, -header_size, SEEK_END);
 
-    if (read(binlog_fd, &header, header_size) != header_size) {
+    if (read(binlog_fd, n, header_size) != header_size) {
         fprintf(stderr, "failed to read (1) from binlog\n");
         return 1;
     }
 
-    *n = header.n;
-    *score = header.score;
-    solution_size = sizeof(int) * header.n;
+    solution_size = sizeof(int) * (*n);
     *solution = malloc(solution_size);
     lseek(binlog_fd, -(header_size + solution_size), SEEK_END);
 

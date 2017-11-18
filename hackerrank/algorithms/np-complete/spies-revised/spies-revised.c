@@ -1,6 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <string.h>
+#include <errno.h>
+
+#include "binlog.h"
 
 /*
 https://www.hackerrank.com/challenges/spies-revised/problem
@@ -75,8 +79,9 @@ int number_of_blown_covers(int n, int *solution) {
 int hill_climber(int n, int *solution) {
     int current_score, next_score, i, j;
 
-    random_solution(n, solution);
     current_score = number_of_blown_covers(n, solution);
+    printf("score = %d\n", current_score);
+
     while (current_score > 0) {
         for (i = 0; i < n; i++) {
             for (j = i + 1; j < n; j++) {
@@ -85,6 +90,7 @@ int hill_climber(int n, int *solution) {
                 if (next_score < current_score) {
                     current_score = next_score;
                     printf("score = %d\n", current_score);
+                    log_write_solution(n, solution);
                 } else if (current_score == next_score) {
                     if (rand() % 2 == 0) {
                         swap(solution, i, j);
@@ -99,21 +105,39 @@ int hill_climber(int n, int *solution) {
     return current_score;
 }
 
-int main(void) {
-    int n, score;
+int main(int argc, char* argv[]) {
+    int n, i, score;
     int *solution;
 
+    if (argc != 2) {
+        printf("Usage: %s N or -c or --continue\n", argv[0]);
+        return -1;
+    }
+
     srand(time(NULL));
-    n = 199;
-    solution = malloc(n * sizeof(int));
+    log_init();
+    if ((strcmp(argv[1], "-c") && strcmp(argv[1], "--continue")) == 0) {
+        log_read_solution(&n, &solution);
+    } else {
+        errno = 0;
+        n = strtol(argv[1], NULL, 0);
+        if (errno) {
+            printf("error parsing N\n");
+            return 1;
+        }
+
+        solution = malloc(n * sizeof(int));
+        random_solution(n, solution);
+    }
+
     score = hill_climber(n, solution);
     printf("n = %d, score = %d\n", n, score);
-    for (int i = 0; i < n; i++) {
+    for (i = 0; i < n; i++) {
         printf("%d ", solution[i] + 1);
     }
 
     printf("\n");
-
+    log_close();
     free(solution);
     return 0;
 }
