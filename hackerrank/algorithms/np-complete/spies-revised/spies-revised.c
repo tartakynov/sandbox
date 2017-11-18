@@ -111,31 +111,37 @@ int hill_climber(int n, int *solution) {
  */
 int simulated_anneal(int n, int *solution) {
     double temperature, epsilon, flip, alpha;
-    int i, j;
-    int current_score, delta;
+    int i, j, q;
+    int current_score, delta, overall_min;
 
-    alpha = 0.999;
-    epsilon = 0.001;
-    temperature = 400.0;
+    alpha = 0.99;
+    epsilon = 0.0001;
+    temperature = 1.0;
     current_score = number_of_blown_covers(n, solution);
+    overall_min = current_score;
     while (temperature > epsilon && current_score > 0) {
-        i = (int) (random() % n);
-        j = (int) (random() % n);
-        swap(solution, i, j);
-        delta = number_of_blown_covers(n, solution) - current_score;
-        if (delta < 0) {
-            current_score += delta;
-            printf("temperature = %.5f, score = %d\n", temperature, current_score);
-        } else {
-            flip = ((double) random()) / RAND_MAX;
-            if (exp(-delta / temperature) > flip) {
+        temperature *= alpha;
+        for (q = 0; q < 100; q++) {
+            i = (int) (random() % n);
+            j = (int) (random() % n);
+            swap(solution, i, j);
+            delta = number_of_blown_covers(n, solution) - current_score;
+            if (delta < 0) {
                 current_score += delta;
             } else {
-                swap(solution, i, j);
+                flip = ((double) random()) / RAND_MAX;
+                if (exp(-delta / temperature) > flip) {
+                    current_score += delta;
+                } else {
+                    swap(solution, i, j);
+                }
             }
         }
 
-        temperature *= alpha;
+        printf("temperature = %.5f, score = %d, min = %d\n", temperature, current_score, overall_min);
+        if (current_score < overall_min) {
+            overall_min = current_score;
+        }
     }
 
     return current_score;
