@@ -53,7 +53,7 @@ void random_solution(int n, int *solution) {
  * Total number of blown covers
  */
 int number_of_blown_covers(int n, int *solution) {
-    int count;
+    int count, found;
     int x1, x2, x3;
 
     count = 0;
@@ -61,12 +61,20 @@ int number_of_blown_covers(int n, int *solution) {
         for (x2 = x1 + 1; x2 < n; x2++) {
             if (are_diagonal(x1, solution[x1], x2, solution[x2]) == 1) {
                 count++;
+                break;
             }
 
+            found = 0;
             for (x3 = x2 + 1; x3 < n; x3++) {
                 if (are_collinear(x1, solution[x1], x2, solution[x2], x3, solution[x3]) == 1) {
-                    count++;
+                    found = 1;
+                    break;
                 }
+            }
+
+            if (found) {
+                count++;
+                break;
             }
         }
     }
@@ -81,7 +89,7 @@ int hill_climber(int n, int *solution) {
     int current_score, next_score, i, j;
 
     current_score = number_of_blown_covers(n, solution);
-    printf("score = %d\n", current_score);
+    printf("%d\n", current_score);
 
     while (current_score > 0) {
         for (i = 0; i < n; i++) {
@@ -90,12 +98,8 @@ int hill_climber(int n, int *solution) {
                 next_score = number_of_blown_covers(n, solution);
                 if (next_score < current_score) {
                     current_score = next_score;
-                    printf("score = %d\n", current_score);
+                    printf("%d\n", current_score);
                     log_write_solution(n, solution);
-                } else if (current_score == next_score) {
-                    if (random() % 2 == 0) {
-                        swap(solution, i, j);
-                    }
                 } else {
                     swap(solution, i, j);
                 }
@@ -120,8 +124,7 @@ int simulated_anneal(int n, int *solution) {
     current_score = number_of_blown_covers(n, solution);
     overall_min = current_score;
     while (temperature > epsilon && current_score > 0) {
-        temperature *= alpha;
-        for (q = 0; q < 100; q++) {
+        for (q = 0; q < n; q++) {
             i = (int) (random() % n);
             j = (int) (random() % n);
             swap(solution, i, j);
@@ -142,6 +145,8 @@ int simulated_anneal(int n, int *solution) {
         if (current_score < overall_min) {
             overall_min = current_score;
         }
+
+        temperature *= alpha;
     }
 
     return current_score;
@@ -156,7 +161,7 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    srand((unsigned int) time(NULL));
+    srandom((unsigned int) time(NULL));
     log_init();
     if (strcmp(argv[1], "-c") == 0 || strcmp(argv[1], "--continue") == 0) {
         if (log_read_solution(&n, &solution) != 0) {
