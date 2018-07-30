@@ -5,4 +5,4 @@
 *.o
 *.bin
 .ipynb_checkpoints
-
+*.pyc
