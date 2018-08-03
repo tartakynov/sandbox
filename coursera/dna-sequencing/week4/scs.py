@@ -27,5 +27,25 @@ def scs_bruteforce(ss):
             shortest_sup = sup
     return shortest_sup
 
+def scs_bruteforce_multi(ss):
+    shortest_length = 0
+    shortest_sups = []
+    for ssperm in permutations(ss):
+        sup = ssperm[0]
+        for i in range(len(ss) - 1):
+            olen = overlap(ssperm[i], ssperm[i + 1], min_length = 1)
+            sup += ssperm[i + 1][olen:]
+        if shortest_length == 0:
+            shortest_length = len(sup)
+            shortest_sups.append(sup)
+        elif len(sup) < shortest_length:
+            shortest_length = len(sup)
+            shortest_sups = [sup]
+        elif len(sup) == shortest_length:
+            shortest_length = len(sup)
+            shortest_sups.append(sup)
+    return shortest_sups
+
 if __name__ == '__main__':
-    print scs_bruteforce(['abaca', 'acada', 'cadana'])
+    print len(scs_bruteforce(['CCT', 'CTT', 'TGC', 'TGG', 'GAT', 'ATT']))
+    print scs_bruteforce_multi(['CCT', 'CTT', 'TGC', 'TGG', 'GAT', 'ATT'])
