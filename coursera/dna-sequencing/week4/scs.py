@@ -16,7 +16,7 @@ def overlap(a, b, min_length=3):
             return len(a) - start
         start += 1
 
-def scs(ss):
+def scs_bruteforce(ss):
     shortest_sup = None
     for ssperm in permutations(ss):
         sup = ssperm[0]
@@ -28,4 +28,4 @@ def scs(ss):
     return shortest_sup
 
 if __name__ == '__main__':
-    print scs(['abaca', 'acada', 'cadana'])
+    print scs_bruteforce(['abaca', 'acada', 'cadana'])
