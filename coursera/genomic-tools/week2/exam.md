@@ -9,8 +9,8 @@ $ samtools view athal_wu_0_A.bam | wc -l
 
 2. How many alignments show the read's mate unmapped?
 ```console
-samtools view -f 0x08 athal_wu_0_A.bam | wc -l
-2903
+$ samtools view athal_wu_0_A.bam | cut -f7 | grep "*" | wc -l
+65521
 ```
 
 3. How many alignments contain a deletion (D)?
@@ -21,8 +21,6 @@ $ samtools view athal_wu_0_A.bam | cut -f6 | grep "D" | wc -l
 
 4. How many alignments show the read’s mate mapped to the same chromosome?
 ```console
-# $ samtools view -F 0x08 athal_wu_0_A.bam | cut -f7 | grep "=" | wc -l
-# 148010
 $ samtools view athal_wu_0_A.bam | cut -f7 | grep "=" | wc -l
 150913
 ```
@@ -44,8 +42,8 @@ $ samtools view athal_wu_0_A.bam "Chr3:11,777,000-11,794,000" | wc -l
 
 7. How many alignments show the read's mate unmapped?
 ```console
-$ samtools view -f 0x08 athal_wu_0_A.bam "Chr3:11,777,000-11,794,000" | wc -l
-483
+$ samtools view athal_wu_0_A.bam "Chr3:11,777,000-11,794,000" | cut -f7 | grep "*" | wc -l
+1983
 ```
 
 8. How many alignments contain a deletion (D)?
