@@ -35,7 +35,7 @@ $ samtools view athal_wu_0_A.bam | cut -f6 | grep "N" | wc -l
 Extract only the alignments in the range `Chr3:11,777,000-11,794,000`, corresponding to a locus of interest. For this alignment set
 
 6. How many alignments does the set contain?
-```
+```console
 $ samtools view athal_wu_0_A.bam "Chr3:11,777,000-11,794,000" | wc -l
 7081
 ```
@@ -88,7 +88,7 @@ ID:stampy
 ```
 
 14. What is the read identifier (name) for the first alignment?
-```
+```console
 $ samtools view athal_wu_0_A.bam | head -n1 | cut -f1
 GAII05_0002:1:113:7822:3886#0
 ```
@@ -110,7 +110,7 @@ $ bedtools intersect -wo -a athal_wu_0_A_annot.gtf -b athal_wu_0_A.bam | wc -l
 ```
 
 17. How many of these are 10 bases or longer?
-```
+```console
 $ bedtools intersect -wo -a athal_wu_0_A_annot.gtf -b athal_wu_0_A.bam | cut -f16 | grep -E "^[0-9]{2,}$" | wc -l
 2899
 ```
