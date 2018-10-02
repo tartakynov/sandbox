@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  bioconductor:
+    image: bioconductor/release_base2:R3.5.1_Bioc3.7
+    environment:
+      - USER=bioconductor
+      - PASSWORD=bioconductor
+    ports:
+      - 8787:8787
+    network_mode: bridge
