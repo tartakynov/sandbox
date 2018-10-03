@@ -2,7 +2,7 @@ version: '3'
 
 services:
   bioconductor:
-    image: bioconductor/release_base2:R3.5.1_Bioc3.7
+    image: bioconductor/release_core2:R3.5.1_Bioc3.7
     environment:
       - USER=bioconductor
       - PASSWORD=bioconductor
