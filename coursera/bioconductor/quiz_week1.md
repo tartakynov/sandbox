@@ -95,4 +95,5 @@ sum(width(cpg_islands_autosomes)) / sum(as.numeric(seqlengths(hg19_autosomes)))
 
 10. Compute an odds-ratio for the overlap of bivalent marks with CpG islands.
 ```R
+# too tired
 ```
