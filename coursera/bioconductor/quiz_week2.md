@@ -24,7 +24,9 @@
 3. The "narrowPeak" regions includes information on a value they call "signalValue".  
 **Question:** What is the correlation between GC content and "signalValue" of these regions (on chr22)?
 ```R
-hello world
+> cor(h3k27me3_chr22$signalValue, freqs)
+             G|C
+[1,] 0.004467924
 ```
 
 4. The "narrowPeak" regions are presumably reflective of a ChIP signal in these regions. To confirm this, we want to obtain the `fc.signal` data from AnnotationHub package on the same cell line and histone modification. This data represents a vector of fold-change enrichment of ChIP signal over input.  
