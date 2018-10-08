@@ -1,14 +1,24 @@
 1. What is the GC content of `chr22` in the `hg19` build of the human genome?  
 **Tip:** The reference genome includes `N` bases; you will need to exclude those.
 ```R
-hello world
+> biocLite("BSgenome.Hsapiens.UCSC.hg19")
+> library("BSgenome.Hsapiens.UCSC.hg19")
+> letterFrequency(Hsapiens$chr22, "GC") / (length(Hsapiens$chr22) - letterFrequency(Hsapiens$chr22, "N"))
+      G|C
+0.4798807
 ```
 
 2. **Background:** In the previous assessment we studied H3K27me3 "narrowPeak" regions from the H1 cell line (recall that the Roadmap ID for this cell line is `E003`). We want to examine whether the GC content of the regions influence the signal; in other words wether the reported results appear biased by GC content.  
 **Question:** What is mean GC content of H3K27me3 "narrowPeak" regions from Epigenomics Roadmap from the H1 stem cell line on chr 22.  
 **Clarification:** Compute the GC content for each peak region as a percentage and then average those percentages to compute a number between 0 and 1.
 ```R
-hello world
+> ah = AnnotationHub()
+> h3k27me3 = ah[["AH29892"]]
+> h3k27me3_chr22 = keepSeqlevels(h3k27me3, c("chr22"), pruning.mode = "coarse")
+> h3k27me3_chr22_dna = getSeq(Hsapiens, h3k27me3_chr22)
+> freqs = letterFrequency(h3k27me3_chr22_dna, "GC", as.prob=TRUE)
+> mean(freqs)
+[1] 0.528866
 ```
 
 3. The "narrowPeak" regions includes information on a value they call "signalValue".  
